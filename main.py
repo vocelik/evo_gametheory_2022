@@ -55,6 +55,8 @@ def main():
         df = df.T
         df.to_csv("results/" + population_type + "/" + str(seed) + ".csv")
 
+        print(f"Seed {seed} completed.")
+
     print("Simulations completed.")
 
     return True
