@@ -10,7 +10,7 @@ from axelrod import Game, Player
 from axelrod.deterministic_cache import DeterministicCache
 from axelrod.graph import Graph
 
-max_rounds = 5
+max_rounds = 10000
 seeds = [1,2,3,4,5,6,7,8,9,10]
 
 def main():
@@ -45,7 +45,7 @@ def main():
 
         print(f"Now running seed: {seed}...")
 
-        mp = HeterogenousMoranProcess(players, match_class=HeterogenousMatch, turns=2, seed=seed, mutation_rate=.1, noise=.1)
+        mp = HeterogenousMoranProcess(players, match_class=HeterogenousMatch, turns=200, seed=seed, mutation_rate=.1, noise=.1)
 
         for i, _ in enumerate(mp):
             if len(mp.population_distribution()) == 1 or i == max_rounds:
