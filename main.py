@@ -1,4 +1,5 @@
 import sys
+import time
 import axelrod as axl
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,11 +11,12 @@ from axelrod import Game, Player
 from axelrod.deterministic_cache import DeterministicCache
 from axelrod.graph import Graph
 
-max_rounds = 1000
+max_rounds = 10
 seeds = [1,2,3,4,5,6,7,8,9,10]
 
 def main():
 
+    # check if the script was called correctly 
     if len(sys.argv) < 3:
         print("Please specify what population the agents should be drawn from and what weight should be given to players.")
         return False
@@ -27,41 +29,53 @@ def main():
         
         return False
     
+    # set up the simulation
     population_type = sys.argv[1]
     masses = distributions[population_type]
     weight = sys.argv[2]
 
+    # set the heterogeneity of mass and weight
     set_player_attributes(players, masses, weight)
-
     print(f"Successfully created a {sys.argv[1]} population with {len(players)} players.")
 
+    # show the distribution of players
     for player in players:
-        print(f"Player {player.id} has mass {player.mass} and weight {player.weight}.")
+        print(f"Player {player} with id {player.id} has mass {player.mass} and weight {player.weight}.")
 
+    # save the plot
     plt.hist(masses)
     plt.savefig("results/" + population_type + "/distribution.png")
-
     print("Population distribution histogram saved.")
 
+    # Begin simulation and track elapsed time
     print("Beginning simulation...")
-
+    start_time = time.time()
     for seed in seeds:
 
+        print(f"Program has run for {round(time.time() - start_time)} seconds ")
         print(f"Now running seed: {seed}...")
 
         mp = HeterogenousMoranProcess(players, match_class=HeterogenousMatch, turns=200, seed=seed, mutation_rate=.1, noise=.1)
-
+        df_seed = pd.DataFrame()
         for i, _ in enumerate(mp):
+            
+            df = pd.DataFrame.from_dict(mp.population_distribution(), orient='index').reset_index()
+            df = df.rename(columns={'index':'strategy', 0:'count'})
+            df['round'] = i
+            df = df.pivot(index = 'round', columns = 'strategy', values = 'count')
+            df_seed = df_seed.append(df)
             if len(mp.population_distribution()) == 1 or i == max_rounds:
                 break    
 
         df = pd.DataFrame(mp.outcomes_per_round)
         df = df.T
         df.to_csv("results/" + population_type + "/" + "seed_" + str(seed) + "_weight_" + str(weight) + ".csv")
-
+        df_seed.to_csv("results/" + population_type + "/" + "seed_" + str(seed) + "_weight_" + str(weight) + "_population_distribution_" + ".csv")
     print("Simulations completed.")
+    print(f"Program has run for {round(time.time() - start_time) / 60} minutes")
 
     return True
+
 
 def set_player_attributes(players, masses, weight):
 
@@ -70,15 +84,16 @@ def set_player_attributes(players, masses, weight):
         setattr(player, "id", "player " + str(i))
         setattr(player, "weight", weight)
 
+
 class HeterogenousMatch(axl.Match):
     """Axelrod Match object with a modified final score function to enable mass to influence the final score as a multiplier"""
     def final_score_per_turn(self):
         base_scores = axl.Match.final_score_per_turn(self)
         # here we flip the list because we want the mass of the opponent to be added to the payoff of the player.
-        mass_scores = [player.mass * score for player, score in zip(self.players[::-1], base_scores)] 
-        # here we do not flip the list because we want the weight of the player to be multiplied with his own mass.
-        final_scores = [score + (player.mass * player.weight) for player, score in zip(self.players, mass_scores)] 
-        return final_scores
+        mass_scores = [round(player.mass * score,2) for player, score in zip(self.players[::-1], base_scores)] 
+        # here we do not flip the list because we want the weight of the player to be multiplied with his own mass. 
+        return [round(score + (player.mass * player.weight),2) for player, score in zip(self.players, mass_scores)]
+
 
 class HeterogenousMoranProcess(axl.MoranProcess):
     """Axelrod MoranProcess class """
@@ -155,6 +170,7 @@ class HeterogenousMoranProcess(axl.MoranProcess):
          set_player_attributes(self.players, distributions[sys.argv[1]], float(sys.argv[2]))
          super().__next__()
          return self
+
 
 if __name__ == "__main__":
     main()
