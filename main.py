@@ -33,7 +33,6 @@ def main():
     population_type = sys.argv[1]
     masses = distributions[population_type]
     weight = sys.argv[2]
-    print(players)
 
     # set the heterogeneity of mass and weight
     set_player_attributes(players, masses, weight)
