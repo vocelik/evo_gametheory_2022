@@ -1,0 +1,128 @@
+---
+title: "Heterogeneous Moran Processes"
+author: "Václav Ocelík"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+h1.title {
+  font-size: 52px;
+  text-align: center;
+}
+h4.author { 
+  font-size: 24px;
+  text-align: center;
+}
+h4.date { 
+  font-size: 24px;
+  text-align: center;
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F, fig.width=18, fig.height=12)
+```
+
+```{r}
+library(tidyverse)
+library(ggthemes)
+
+theme_set(theme_classic())
+```
+
+
+```{r}
+custom_theme <- function(df){
+  df %>%
+    theme(plot.title = element_text(size = 35, hjust = 0.5),
+        plot.subtitle = element_text(size = 20, hjust = 0.5),
+        legend.text = element_text(size = 18),
+        strip.text = element_text(size=18),
+        legend.title = element_text(size = 20))
+}
+```
+
+
+```{r}
+
+outcomes <- list.files(path = "../results/normal/", pattern = "outcomes.*_weight_0.csv", full.names = T) %>%
+  map_df(~read_csv(.)) %>%
+   mutate(seed = rep(1:nrow(.), each = 4, length.out = nrow(.))) %>%
+    mutate(outcome = str_c(...1, ...2),
+         outcome = case_when(
+           str_detect(outcome, "CC") ~ "cooperation",
+           str_detect(outcome, "CD") ~ "exploitation",
+           str_detect(outcome, "DC") ~ "exploitation",
+           str_detect(outcome, "DD") ~ "defection",
+         )) %>%
+  select(-...1,-...2) %>%
+  pivot_longer(!outcome:seed, names_to = "round", values_to = "count") %>%
+  group_by(outcome, seed, round) %>%
+  mutate(count = sum(count)) %>%
+  ungroup() %>%
+  distinct() %>%
+  mutate(round = as.integer(round)) %>%
+  replace(is.na(.), 0)
+
+strategies <- list.files(path = "../results/normal/" , pattern = "population.*0.csv", full.names = T) %>%
+  map_df(~read_csv(.)) %>%
+  replace(is.na(.), 0) %>%
+  pivot_longer(!round, names_to = "strategy", values_to = "count") %>%
+  mutate(seed = rep(1:nrow(.), each = 10010, length.out = nrow(.)))
+```
+
+
+
+```{r}
+outcomes %>%
+  group_by(round, seed) %>%
+  mutate(sum_count = sum(count),
+         count = count/sum_count) %>%
+  ungroup() %>%
+  mutate(seed = str_c("seed ",as.character(seed))) %>%
+  ggplot() +
+  geom_bar(stat = "identity", aes(round, count, fill = outcome)) +
+  scale_fill_grey() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Distribution of outcomes in the simulation",
+       subtitle = "Mass follows a truncated normal distribution",
+       y = " ") +
+  theme(plot.title = element_text(size = 35, hjust = 0.5),
+        plot.subtitle = element_text(size = 20, hjust = 0.5),
+        legend.text = element_text(size = 16, hjust = 0.5),
+        strip.text = element_text(size=16),
+        legend.title = element_text(size = 16, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title.x =element_text(size = 16)) +
+  facet_wrap(~seed)
+```
+
+```{r}
+strategies %>%
+  replace(is.na(.), 0) %>%
+  group_by(round, seed) %>%
+  mutate(sum_count = sum(count),
+         count = count/sum_count) %>%
+  ungroup() %>%
+  mutate(seed = str_c("seed ",as.character(seed))) %>%
+  ggplot() +
+    geom_col(aes(round, count, fill = strategy)) +
+    scale_fill_brewer(palette = "Paired") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Distribution of strategies in the simulation",
+       subtitle = "Mass follows a truncated normal distribution",
+       y = " ") +
+  theme(plot.title = element_text(size = 35, hjust = 0.5),
+        plot.subtitle = element_text(size = 20, hjust = 0.5),
+        legend.text = element_text(size = 16, hjust = 0.5),
+        strip.text = element_text(size=16),
+        legend.title = element_text(size = 16, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title.x =element_text(size = 16)) +
+  facet_wrap(~seed)
+```
