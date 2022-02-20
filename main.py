@@ -15,8 +15,8 @@ seeds = [1,2,3,4,5,6,7,8,9,10]
 
 def main():
 
-    if len(sys.argv) < 2:
-        print("Please specify what population the agents should be drawn from.")
+    if len(sys.argv) < 3:
+        print("Please specify what population the agents should be drawn from and what weight should be given to players.")
         return False
 
     if sys.argv[1] not in list(distributions.keys()):
@@ -28,11 +28,15 @@ def main():
         return False
     
     population_type = sys.argv[1]
-    masses = distributions[sys.argv[1]]
+    masses = distributions[population_type]
+    weight = sys.argv[2]
 
-    set_player_attributes(players, masses)
+    set_player_attributes(players, masses, weight)
 
     print(f"Successfully created a {sys.argv[1]} population with {len(players)} players.")
+
+    for player in players:
+        print(f"Player {player.id} has mass {player.mass} and weight {player.weight}.")
 
     plt.hist(masses)
     plt.savefig("results/" + population_type + "/distribution.png")
@@ -53,25 +57,28 @@ def main():
 
         df = pd.DataFrame(mp.outcomes_per_round)
         df = df.T
-        df.to_csv("results/" + population_type + "/" + str(seed) + ".csv")
-
-        print(f"Seed {seed} completed.")
+        df.to_csv("results/" + population_type + "/" + "seed_" + str(seed) + "_weight_" + str(weight) + ".csv")
 
     print("Simulations completed.")
 
     return True
 
-def set_player_attributes(players, masses):
+def set_player_attributes(players, masses, weight):
 
     for i, (player, mass) in enumerate(zip(players, masses)):
         setattr(player, "mass", mass)
         setattr(player, "id", "player " + str(i))
+        setattr(player, "weight", weight)
 
 class HeterogenousMatch(axl.Match):
     """Axelrod Match object with a modified final score function to enable mass to influence the final score as a multiplier"""
     def final_score_per_turn(self):
         base_scores = axl.Match.final_score_per_turn(self)
-        return [player.mass * score for player, score in zip(self.players[::-1], base_scores)]
+        # here we flip the list because we want the mass of the opponent to be added to the payoff of the player.
+        mass_scores = [player.mass * score for player, score in zip(self.players[::-1], base_scores)] 
+        # here we do not flip the list because we want the weight of the player to be multiplied with his own mass.
+        final_scores = [score + (player.mass * player.weight) for player, score in zip(self.players, mass_scores)] 
+        return final_scores
 
 class HeterogenousMoranProcess(axl.MoranProcess):
     """Axelrod MoranProcess class """
@@ -145,7 +152,7 @@ class HeterogenousMoranProcess(axl.MoranProcess):
 
     """Axelrod MoranProcess class """
     def __next__(self):
-         set_player_attributes(self.players, distributions[sys.argv[1]])
+         set_player_attributes(self.players, distributions[sys.argv[1]], float(sys.argv[2]))
          super().__next__()
          return self
 
