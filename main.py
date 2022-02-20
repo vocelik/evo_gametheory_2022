@@ -11,7 +11,7 @@ from axelrod import Game, Player
 from axelrod.deterministic_cache import DeterministicCache
 from axelrod.graph import Graph
 
-max_rounds = 10
+max_rounds = 1000
 seeds = [1,2,3,4,5,6,7,8,9,10]
 
 def main():
@@ -33,6 +33,7 @@ def main():
     population_type = sys.argv[1]
     masses = distributions[population_type]
     weight = sys.argv[2]
+    print(players)
 
     # set the heterogeneity of mass and weight
     set_player_attributes(players, masses, weight)
@@ -44,7 +45,7 @@ def main():
 
     # save the plot
     plt.hist(masses)
-    plt.savefig("results/" + population_type + "/distribution.png")
+    #plt.savefig("results/" + population_type + "/distribution.png")
     print("Population distribution histogram saved.")
 
     # Begin simulation and track elapsed time
@@ -68,9 +69,8 @@ def main():
                 break    
 
         df = pd.DataFrame(mp.outcomes_per_round)
-        df = df.T
-        df.to_csv("results/" + population_type + "/" + "seed_" + str(seed) + "_weight_" + str(weight) + ".csv")
-        df_seed.to_csv("results/" + population_type + "/" + "seed_" + str(seed) + "_weight_" + str(weight) + "_population_distribution_" + ".csv")
+        df.to_csv("results/" + population_type + "/outcomes_" + "seed_" + str(seed) + "_weight_" + str(weight) + ".csv")
+        df_seed.to_csv("results/" + population_type + "/population_distribution_" + "seed_" + str(seed) + "_weight_" + str(weight) + ".csv")
     print("Simulations completed.")
     print(f"Program has run for {round(time.time() - start_time) / 60} minutes")
 
