@@ -44,7 +44,7 @@ def main():
 
     # save the plot
     plt.hist(masses)
-    #plt.savefig("results/" + population_type + "/distribution.png")
+    plt.savefig("results/" + population_type + "/distribution.png")
     print("Population distribution histogram saved.")
 
     # Begin simulation and track elapsed time
