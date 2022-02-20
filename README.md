@@ -18,10 +18,6 @@ $P = 1$
 
 $S = 0$
 
-So that the payoff matrix $A$
-
-$$A = \begin{pmatrix} 3,3 & 0,5 \\ 5,0 & 1,1 \end{pmatrix}$$
-
 Into
 
 $T = 5\times m_{p_2} + m_{p_1}\times W_{p_1}$
@@ -39,13 +35,6 @@ $m_{p_n}$ denotes the mass $m$ of player $p_n$
 and
 
 $w_{p_n}$ denotes the weight $w$ of player $p_n$
-
-So that the payoff matrix $B$
-
-$$
-B = 
-\begin{pmatrix} 3\times  m_{p_2} + m_{p_1}\times W_{p_1},  3\times  m_{p_1} + m_{p_2}\times W_{p_2} & 0\times  m_{p_2} + m_{p_1}\times W_{p_1},  5\times  m_{p_1} + m_{p_2}\times W_{p_2} \\ 5\times  m_{p_2} + m_{p_1}\times W_{p_1},  0\times  m_{p_1} + m_{p_2}\times W_{p_2} & 1\times  m_{p_2} + m_{p_1}\times W_{p_1},  1\times  m_{p_1} + m_{p_2}\times W_{p_2} \end{pmatrix}
-$$ 
 
 ## Distributions
 
