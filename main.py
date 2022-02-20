@@ -10,7 +10,7 @@ from axelrod import Game, Player
 from axelrod.deterministic_cache import DeterministicCache
 from axelrod.graph import Graph
 
-max_rounds = 10000
+max_rounds = 1000
 seeds = [1,2,3,4,5,6,7,8,9,10]
 
 def main():

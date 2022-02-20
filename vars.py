@@ -16,10 +16,11 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 #players
-defectors = [axl.Defector() for i in range(25)]
-cooperators = [axl.Cooperator() for i in range(25)]
-tit_for_tatters = [axl.TitForTat() for i in range(25)]
-generous_tit_for_tatters = [axl.GTFT() for i in range(25)]
+number = 10
+defectors = [axl.Defector() for i in range(number)]
+cooperators = [axl.Cooperator() for i in range(number)]
+tit_for_tatters = [axl.TitForTat() for i in range(number)]
+generous_tit_for_tatters = [axl.GTFT() for i in range(number)]
 players = defectors + cooperators + tit_for_tatters + generous_tit_for_tatters
 
 random.Random(1).shuffle(players)
