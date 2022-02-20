@@ -60,3 +60,7 @@ The following strategies are by default generated in the population as included 
 - Tit For Tat
 - Win-Shift Lose-Stay: D
 - Win-Stay Lose-Shift
+
+## Analysis
+
+The analysis, performed in R can be found in the `analysis` folder and previewed [here](https://htmlpreview.github.io/?https://github.com/vocelik/evo_gametheory_2022/blob/main/analysis/main.html).
