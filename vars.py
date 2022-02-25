@@ -16,6 +16,8 @@ random.Random(1).shuffle(PLAYERS)
 SEEDS = [1,2,3,4,5,6,7,8,9,10]
 MUTATION_RATE = .1
 NOISE = .1
+MASS_BASE = 1
+WEIGHT_BASE = 1
 
 
 def get_truncated_normal(mean, sd, low, upp):
@@ -32,11 +34,11 @@ W_trunc = get_truncated_normal(mean=1, sd = 1, low = 0.1, upp = 2)
 distributions_mass = {
     "normal": [round(np.random.choice([i for i in M_trunc.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
     "pareto": [round(np.random.choice(pareto_sample_truncated), 1) for _ in range(len(PLAYERS))],
-    "homo":[1 for _ in range(len(PLAYERS))]
+    "homo":[MASS_BASE for _ in range(len(PLAYERS))]
 }
 
 distributions_weight = {
     "normal": [round(np.random.choice([i for i in W_trunc.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
     "pareto": [round(np.random.choice(pareto_sample_truncated), 1) for _ in range(len(PLAYERS))],
-    "homo":[1 for _ in range(len(PLAYERS))]
+    "homo":[MASS_BASE for _ in range(len(PLAYERS))]
 }

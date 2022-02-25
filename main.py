@@ -100,10 +100,11 @@ def print_simulation_record():
 
 class MassBaseMatch(axl.Match):
      """Axelrod Match object with a modified final score function to enable mass to influence the final score as a multiplier"""
-     def final_score_per_turn(self):     
+     def final_score_per_turn(self): 
+         outcomes.append(Counter([regex.sub('',str(i)) for i in self.result]))    
          base_scores = axl.Match.final_score_per_turn(self)
-         final_scores = [PLAYER.mass * score for PLAYER, score in zip(self.players[::-1], base_scores)]
-         outcomes.append(Counter([regex.sub('',str(i)) for i in self.result]))
+         mass_scores = [PLAYER.mass * score for PLAYER, score in zip(self.players[::-1], base_scores)]
+         final_scores = [score + (PLAYER.mass * PLAYER.weight) for PLAYER, score in zip(self.players, mass_scores)]
          return final_scores
 
 
