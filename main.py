@@ -8,7 +8,7 @@ import pandas as pd
 
 from collections import Counter
 from math import comb
-from vars import PLAYERS, SEEDS, MAX_ROUNDS, MUTATION_RATE, NOISE, TURNS, distributions_mass, distributions_weight, regex, strategies
+from vars import *
 
 # import note, strategies only have memory inside a match class
 outcomes = []
@@ -64,6 +64,7 @@ def main():
         df_outcomes = pd.DataFrame(outcomes).fillna(0).rename(columns = {"CC":"coop","CD":"exploit","DC":"exploit_","DD":"defect",})
         df_outcomes['round'] = np.repeat([i + 1 for i in range(MAX_ROUNDS)], comb(len(PLAYERS),2))
         df_outcomes = df_outcomes.groupby(['round']).sum()
+        df_outcomes = df_outcomes.astype(int)
         df_outcomes.to_csv("results/outcomes_per_round/" + "mass_" + str(sys.argv[1]) + "_weight_" + str(sys.argv[2]) + "_SEED_ " + str(SEED) + "_outcomes.csv")
         outcomes = []
     
@@ -98,16 +99,30 @@ def save_initialized_plot():
 
 
 def print_simulation_record():
+
     print("-" * 75)
     print("\tStarting simulations with the following parameters:")
-    print(f"\tmax rounds: {MAX_ROUNDS}")
-    print(f"\tturns: {TURNS}")
-    print(f"\tseeds: {[seed for seed in SEEDS]}")
-    print(f"\tmutation rate: {MUTATION_RATE}")
-    print(f"\tnoise: {NOISE}")
-    print(f"\tmass: {sys.argv[1]} distribution")
-    print(f"\tweight: {sys.argv[2]} distribution")
-    print(f"\tnumber of players: {len(PLAYERS)}")
+    print(f"\tMax rounds: {MAX_ROUNDS}")
+    print(f"\tTurns: {TURNS}")
+    print(f"\tSeeds: {[seed for seed in SEEDS]}")
+    print(f"\tMutation rate: {MUTATION_RATE}")
+    print(f"\tNoise: {NOISE}")
+
+    print(f"\tMass: {sys.argv[1]} distribution")
+    if sys.argv[1] == "homo":
+        print(f"\t\tMass base: {distributions_mass[sys.argv[1]][0]}")
+    if sys.argv[1] == "pareto":
+        print(f"\t\tPareto shape: {PARETO_SHAPE_MASS}")
+        print(f"\t\tPareto scale: {PARETO_SCALE_MASS}")
+
+    print(f"\tWeight: {sys.argv[2]} distribution")
+    if sys.argv[2] == "homo":
+        print(f"\t\tWeight base: {distributions_weight[sys.argv[2]][0]}")
+    if sys.argv[2] == "pareto":
+        print(f"\t\tPareto shape: {PARETO_SHAPE_WEIGHT}")
+        print(f"\t\tPareto scale: {PARETO_SCALE_WEIGHT}")
+
+    print(f"\tNumber of players: {len(PLAYERS)}")
     print(f"\tStrategies:")
     for strategy in strategies:
         print(f"\t\t{strategy()}")
@@ -119,8 +134,8 @@ class MassBaseMatch(axl.Match):
      def final_score_per_turn(self): 
          outcomes.append(Counter([regex.sub('',str(i)) for i in self.result]))    
          base_scores = axl.Match.final_score_per_turn(self)
-         mass_scores = [round(PLAYER.mass * score,2) for PLAYER, score in zip(self.players[::-1], base_scores)]
-         return [round(score + (PLAYER.mass * PLAYER.weight),2) for PLAYER, score in zip(self.players, mass_scores)]
+         mass_scores = [PLAYER.mass * score for PLAYER, score in zip(self.players[::-1], base_scores)]
+         return [score + (PLAYER.mass * PLAYER.weight) for PLAYER, score in zip(self.players, mass_scores)]
 
 
 class MassBasedMoranProcess(axl.MoranProcess):
