@@ -26,7 +26,7 @@ random.Random(1).shuffle(PLAYERS) # randomize list of players
 # DISTRIBUTIONS
 
 ## Pareto
-pareto_upper_bound_mass, parato_upper_bound_independence = 2, 2
+pareto_upper_bound_mass, pareto_upper_bound_independence = 2, 2
 pareto_population_mass = (np.random.pareto(1, pow(10,6)) + 1) * 1/10
 pareto_population_independence = (np.random.pareto(1, pow(10,6)) + 1) * 1/10
 
@@ -59,7 +59,7 @@ distributions_mass = {
 # independence 
 distributions_independence = {
     "normal": normal_population_independence[(normal_population_independence < normal_independence_upper_bound) & (normal_population_independence > normal_independence_lower_bound)][:len(PLAYERS)].round(2),
-    "pareto": pareto_population_independence[pareto_population_independence < parato_upper_bound_independence][:len(PLAYERS)].round(2),
+    "pareto": pareto_population_independence[pareto_population_independence < pareto_upper_bound_independence][:len(PLAYERS)].round(2),
     "symetric_bimodal": list(np.random.choice(symetric_bimodal, len(PLAYERS), p = symetric_prob)),
     "asymetric_bimodal": list(np.random.choice(asymetric_bimodal, len(PLAYERS), p = asymetric_prob)),
     "homo":[independence_base for _ in range(len(PLAYERS))]
