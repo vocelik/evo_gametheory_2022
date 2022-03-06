@@ -2,69 +2,65 @@ import axelrod as axl
 import numpy as np
 import re
 import random
-
 from scipy.stats import truncnorm
 
 np.random.seed(1) # important because we are generating the mass distributions through numpy
 
-regex = re.compile('[^a-zA-Z]')
-strategies = [axl.Defector, axl.TitForTat, axl.Cooperator, axl.WinStayLoseShift, axl.Adaptive, axl.Grudger, axl.ZDExtortion, axl.ZDGen2, axl.GTFT, axl.Bully]
-NUMBER_OF_PLAYERS = 5
-MAX_ROUNDS = 1
+
+regex = re.compile('[^a-zA-Z]') # used for cleaning result output
+
+
+# MORAN PROCESS SETUP
+MAX_ROUNDS = 50
 SEEDS = [1,2,3,4,5,6,7,8,9,10]
-TURNS = 200
+TURNS = 100
 MUTATION_RATE = .1
 NOISE = .1
-MASS_BASE = 4
-WEIGHT_BASE = 10
-PLAYERS = [player() for player in range(NUMBER_OF_PLAYERS) for player in strategies]
-random.Random(1).shuffle(PLAYERS)
 
+# STRATEGY SETUP
+STRATEGIES = [axl.Defector, axl.WinStayLoseShift, axl.TitForTat, axl.GTFT, axl.Cooperator]
+NUMBER_OF_PLAYERS = 10
+PLAYERS = [player() for player in range(NUMBER_OF_PLAYERS) for player in STRATEGIES]
+random.Random(1).shuffle(PLAYERS) # randomize list of players
 
-def get_truncated_normal(mean, sd, low, upp):
-    return truncnorm(
-        (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
+# DISTRIBUTIONS
 
+## Pareto
+pareto_upper_bound_mass, parato_upper_bound_independence = 2, 2
+pareto_population_mass = (np.random.pareto(1, pow(10,6)) + 1) * 1/10
+pareto_population_independence = (np.random.pareto(1, pow(10,6)) + 1) * 1/10
 
-# PARETO SETUP
-PARETO_SHAPE_MASS = 1
-PARETO_SCALE_MASS = .1
-PARETO_UPPER_BOUND_MASS = 2
-pareto_distribution_MASS = (np.random.pareto(PARETO_SHAPE_MASS, 1000000) + 1) * PARETO_SCALE_MASS
-pareto_sample_MASS = [round(i,1) for i in pareto_distribution_MASS]
-pareto_sample_truncated_MASS = [i for i in pareto_sample_MASS if i <= PARETO_UPPER_BOUND_MASS]
+## Normal
+normal_mass_lower_bound, normal_mass_upper_bound = 1/10, 2
+normal_population_mass = np.random.normal(1, 1/3, pow(10,6))
+normal_independence_lower_bound, normal_independence_upper_bound = .1, 2
+normal_population_independence = np.random.normal(1, 1/3, pow(10,6))
 
-PARETO_SHAPE_WEIGHT = 6
-PARETO_SCALE_WEIGHT = .5
-PARETO_UPPER_BOUND_WEIGHT = 2
-pareto_distribution_WEIGHT = (np.random.pareto(PARETO_SHAPE_WEIGHT, 1000000) + 1) * PARETO_SCALE_WEIGHT
-pareto_sample_WEIGHT = [round(i,1) for i in pareto_distribution_WEIGHT]
-pareto_sample_truncated_WEIGHT = [i for i in pareto_sample_WEIGHT if i <= PARETO_UPPER_BOUND_WEIGHT]
+## Bimodal
+symetric_bimodal, symetric_prob = [.7, 1.3], [.5, .5]
+asymetric_bimodal, asymetric_prob = [.85, 1.6], [.8, .2]
 
+## Homogenous
 
-# TRUNCATED NORMAL DISTRIBUTION SETUP
-MASS_TRUNCATED_DISTRIBUTION = get_truncated_normal(mean=1, sd = 1, low = 0.1, upp = 2)
-WEIGHT_TRUNCATED_DISTRIBUTION = get_truncated_normal(mean=1, sd = 1, low = 0.1, upp = 2)
+mass_base = 1 # value of mass when distribution is homogenous
+independence_base = 1 # value of independence when distribution is homogenous
 
+# SIMULATION VALUES
 
-#BIMODAL DISTRIBUTION
-BIMODAL_STRONG_PLAYER_MASS = 2
-BIMODAL_WEAK_PLAYER_MASS = .1
-BIMODAL_STRONG_PLAYER_WEIGHT = 2
-BIMODAL_WEAK_PLAYER_WEIGHT = .1
-
-# DISTRIBUTIONS OF MASS AND WEIGHT
+# mass 
 distributions_mass = {
-    "normal": [round(np.random.choice([i for i in MASS_TRUNCATED_DISTRIBUTION.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
-    "pareto": [round(np.random.choice(pareto_sample_truncated_MASS), 1) for _ in range(len(PLAYERS))],
-    "bimodal": [BIMODAL_STRONG_PLAYER_MASS for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER_MASS for _ in range( int( len(PLAYERS) / 2) ) ],
-    "homo":[MASS_BASE for _ in range(len(PLAYERS))]
+    "normal": normal_population_mass[(normal_population_mass < normal_mass_upper_bound) & (normal_population_mass > normal_mass_lower_bound)][:len(PLAYERS)].round(2),
+    "pareto": pareto_population_mass[pareto_population_mass < pareto_upper_bound_mass][:len(PLAYERS)].round(2),
+    "symetric_bimodal": list(np.random.choice(symetric_bimodal, len(PLAYERS), p = symetric_prob)),
+    "asymetric_bimodal": list(np.random.choice(asymetric_bimodal, len(PLAYERS), p = asymetric_prob)),
+    "homo":[mass_base for _ in range(len(PLAYERS))]
 }
 
-
-distributions_weight = {
-    "normal": [round(np.random.choice([i for i in WEIGHT_TRUNCATED_DISTRIBUTION.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
-    "pareto": [round(np.random.choice(pareto_sample_truncated_WEIGHT), 1) for _ in range(len(PLAYERS))],
-    "bimodal": [BIMODAL_STRONG_PLAYER_WEIGHT for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER_WEIGHT for _ in range( int( len(PLAYERS) / 2) ) ],
-    "homo":[WEIGHT_BASE for _ in range(len(PLAYERS))]
+# independence 
+distributions_independence = {
+    "normal": normal_population_independence[(normal_population_independence < normal_independence_upper_bound) & (normal_population_independence > normal_independence_lower_bound)][:len(PLAYERS)].round(2),
+    "pareto": pareto_population_independence[pareto_population_independence < parato_upper_bound_independence][:len(PLAYERS)].round(2),
+    "symetric_bimodal": list(np.random.choice(symetric_bimodal, len(PLAYERS), p = symetric_prob)),
+    "asymetric_bimodal": list(np.random.choice(asymetric_bimodal, len(PLAYERS), p = asymetric_prob)),
+    "homo":[independence_base for _ in range(len(PLAYERS))]
 }
