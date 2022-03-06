@@ -48,15 +48,16 @@ WEIGHT_TRUNCATED_DISTRIBUTION = get_truncated_normal(mean=1, sd = 1, low = 0.1, 
 
 
 #BIMODAL DISTRIBUTION
-BIMODAL_STRONG_PLAYER = 2
-BIMODAL_WEAK_PLAYER = .1
-
+BIMODAL_STRONG_PLAYER_MASS = 2
+BIMODAL_WEAK_PLAYER_MASS = .1
+BIMODAL_STRONG_PLAYER_WEIGHT = 2
+BIMODAL_WEAK_PLAYER_WEIGHT = .1
 
 # DISTRIBUTIONS OF MASS AND WEIGHT
 distributions_mass = {
     "normal": [round(np.random.choice([i for i in MASS_TRUNCATED_DISTRIBUTION.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
     "pareto": [round(np.random.choice(pareto_sample_truncated_MASS), 1) for _ in range(len(PLAYERS))],
-    "bimodal": [BIMODAL_STRONG_PLAYER for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER for _ in range( int( len(PLAYERS) / 2) ) ],
+    "bimodal": [BIMODAL_STRONG_PLAYER_MASS for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER_MASS for _ in range( int( len(PLAYERS) / 2) ) ],
     "homo":[MASS_BASE for _ in range(len(PLAYERS))]
 }
 
@@ -64,6 +65,6 @@ distributions_mass = {
 distributions_weight = {
     "normal": [round(np.random.choice([i for i in WEIGHT_TRUNCATED_DISTRIBUTION.rvs(1000)]), 1) for _ in range(len(PLAYERS))],
     "pareto": [round(np.random.choice(pareto_sample_truncated_WEIGHT), 1) for _ in range(len(PLAYERS))],
-    "bimodal": [BIMODAL_STRONG_PLAYER for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER for _ in range( int( len(PLAYERS) / 2) ) ],
+    "bimodal": [BIMODAL_STRONG_PLAYER_WEIGHT for _ in range( int( len(PLAYERS) / 2) ) ] + [BIMODAL_WEAK_PLAYER_WEIGHT for _ in range( int( len(PLAYERS) / 2) ) ],
     "homo":[WEIGHT_BASE for _ in range(len(PLAYERS))]
 }
