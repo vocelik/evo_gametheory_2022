@@ -43,6 +43,8 @@ asymetric_bimodal, asymetric_prob = [.85, 1.6], [.8, .2]
 ## Uniform
 uniform_population_mass = np.linspace(.1, 2, len(PLAYERS)).round(2)
 uniform_population_independence = np.linspace(.1, 2, len(PLAYERS)).round(2)
+np.random.shuffle(uniform_population_mass)
+np.random.shuffle(uniform_population_independence)
 
 ## Homogenous
 
