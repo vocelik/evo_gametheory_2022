@@ -71,7 +71,7 @@ def main():
         outcomes = []
     
     # show how long simulations took
-    print(f"Program ran for {round(time.time() - start_time) / 3600 ,2} hours.")
+    print(f"Program ran for {round(time.time() - start_time / 3600, 1)} hours.")
 
 
 def set_PLAYER_heterogeneity(PLAYERS, masses, independences, ids = [i for i in range(len(PLAYERS))]):

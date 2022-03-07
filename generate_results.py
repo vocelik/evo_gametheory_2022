@@ -44,7 +44,7 @@ def main():
                 df_plot.set_ylabel('count')
                 df_plot.set_xlabel('round')
                 fig = df_plot.get_figure()
-                fig.savefig("results/outcomes_per_round/seed_" + re.sub('[^0-9]','',outcomes_csv) + ".png")
+                fig.savefig("results/outcomes_per_round/seed_" + re.sub('[^0-9]','',outcomes_csv) + "_mass_ " + sys.argv[1] + ' _independence_' + sys.argv[2] + ".png")
                 plt.clf()
 
                 df = pd.melt(df, id_vars=['round','seed'], value_vars=['coop','defect','exploitation'])
