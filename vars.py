@@ -11,8 +11,8 @@ regex = re.compile('[^a-zA-Z]') # used for cleaning result output
 
 
 # MORAN PROCESS SETUP
-MAX_ROUNDS = 5
-SEEDS = [1,2,3,4,5]
+MAX_ROUNDS = 1000
+SEEDS = [i + 1 for i in range(10)]
 TURNS = 100
 MUTATION_RATE = .1
 NOISE = .1
