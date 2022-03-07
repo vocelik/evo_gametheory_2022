@@ -1,7 +1,6 @@
 import axelrod as axl
 import numpy as np
 import re
-import random
 from scipy.stats import truncnorm
 
 np.random.seed(1) # important because we are generating the mass distributions through numpy
@@ -21,7 +20,7 @@ NOISE = .1
 STRATEGIES = [axl.Defector, axl.WinStayLoseShift, axl.TitForTat, axl.GTFT, axl.Cooperator]
 NUMBER_OF_PLAYERS = 10
 PLAYERS = [player() for player in range(NUMBER_OF_PLAYERS) for player in STRATEGIES]
-random.Random(1).shuffle(PLAYERS) # randomize list of players
+np.random.shuffle(PLAYERS) # randomize list of players
 
 # DISTRIBUTIONS
 
