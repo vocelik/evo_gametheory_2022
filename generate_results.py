@@ -19,18 +19,19 @@ def main():
 
     directory_in_str = "results/outcomes_per_round/"
 
-    with open("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] + ".csv", 'w', encoding='UTF8', newline='') as f:
+    with open("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + ".csv", 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['round','seed','strategy','count','percentage'])
         
-        for i, file in enumerate(os.listdir(directory_in_str)):
+        for file in os.listdir(directory_in_str):
             filename = os.fsdecode(file)
-            if filename.endswith(str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_outcomes.csv"): 
-                df_final = pd.DataFrame()
+            if filename.endswith(str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_outcomes.csv"): 
                 outcomes_csv = os.path.join(directory_in_str, filename)
+                seed_long = re.sub('_mass.*','',outcomes_csv)
+                seed = re.sub('[^0-9]','',seed_long)
                 
                 df = pd.read_csv(outcomes_csv)
-                df['seed'] = int(re.sub('[^0-9]','',outcomes_csv))
+                df['seed'] = int(seed)
                 df['exploitation'] = df['exploit'] + df['exploit_']
                 df['total'] = df['coop'] + df['defect'] + df['exploitation'] 
                 df['coop_percentage'] = round(df['coop'] / df['total'],2)
@@ -40,11 +41,11 @@ def main():
                 df_plot = df[['coop','defect','exploitation']]
                 df_plot = sns.lineplot(data=df_plot, linewidth = 2.5)
                 sns.move_legend(df_plot, "upper right", bbox_to_anchor=(.99, .99), title='outcome')
-                df_plot.set_title('Outcomes of simulation.' + ' Mass: ' + sys.argv[1] + ' Independence: ' + sys.argv[2] + ' Seed: ' + re.sub('[^0-9]','',outcomes_csv))
+                df_plot.set_title('Outcomes of simulation.' + ' Mass: ' + sys.argv[1] + ' Independence: ' + sys.argv[2] + ' Seed: ' + seed + " Mass weight " + str(sys.argv[3]) + " Independence weight " + str(sys.argv[4]))
                 df_plot.set_ylabel('count')
                 df_plot.set_xlabel('round')
                 fig = df_plot.get_figure()
-                fig.savefig("results/outcomes_per_round/seed_" + re.sub('[^0-9]','',outcomes_csv) + "_mass_ " + sys.argv[1] + ' _independence_' + sys.argv[2] + ".png")
+                fig.savefig("results/outcomes_per_round/seed_" + seed + "_mass_ " + sys.argv[1] + ' _independence_' + sys.argv[2] + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + ".png")
                 plt.clf()
 
                 df = pd.melt(df, id_vars=['round','seed'], value_vars=['coop','defect','exploitation'])
@@ -55,7 +56,7 @@ def main():
             else:
                 continue
 
-    df = pd.read_csv("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] + ".csv")
+    df = pd.read_csv("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] +  "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + ".csv")
     df['average_percentage'] = round(df.groupby(['seed','strategy'])['percentage'].transform('mean'),3)
     df['sd_percentage'] = round(df.groupby(['seed','strategy'])['percentage'].transform('std'),3)  
     df['average_sum'] = round(df.groupby(['seed','strategy'])['count'].transform('sum'),0) 
@@ -69,10 +70,10 @@ def main():
     df_plot.set_ylabel('average percentage')
     df_plot.set_xlabel('seed')
     fig = df_plot.get_figure()
-    fig.savefig("results/outcomes_per_round/mass_ " + sys.argv[1] + "_independence_" + sys.argv[2] + "average_percentage.png")
+    fig.savefig("results/outcomes_per_round/mass_ " + sys.argv[1] + "_independence_" + sys.argv[2] + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_average_percentage.png")
     plt.clf()
 
-    df.to_csv("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] + "_averages.csv")
+    df.to_csv("results/outcomes_per_round/summary_results_mass_" + sys.argv[1] + "_independence_" + sys.argv[2] + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_averages.csv")
 
 
 if __name__ == "__main__":

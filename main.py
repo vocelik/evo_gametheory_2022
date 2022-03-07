@@ -16,8 +16,8 @@ def main():
     global outcomes
 
     # check if the script was called correctly 
-    if len(sys.argv) < 3:
-        print("Please specify what population the agents should be drawn from and what independence should be given to PLAYERS.")
+    if len(sys.argv) < 5:
+        print("You have not inputted all necessary terminal arguments.")
         return False
 
     if sys.argv[1] not in list(distributions_mass.keys()):
@@ -59,7 +59,7 @@ def main():
 
         rounds_played = i
         # save population distribution
-        pd.DataFrame(mp.populations).fillna(0).astype(int).to_csv("results/population_evolution/seed_ " + str(SEED) + "_mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_population_distribution.csv")
+        pd.DataFrame(mp.populations).fillna(0).astype(int).to_csv("results/population_evolution/seed_ " + str(SEED) + "_mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_population_distribution.csv")
 
         # save outcomes of each round
         df_outcomes = pd.DataFrame(outcomes).fillna(0).rename(columns = {"CC":"coop","CD":"exploit","DC":"exploit_","DD":"defect",})
@@ -67,7 +67,7 @@ def main():
         df_outcomes['seed'] = SEED
         df_outcomes = df_outcomes.groupby(['round','seed']).sum()
         df_outcomes = df_outcomes.astype(int)
-        df_outcomes.to_csv("results/outcomes_per_round/seed_" + str(SEED) + "_mass_"  + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_outcomes.csv")
+        df_outcomes.to_csv("results/outcomes_per_round/seed_" + str(SEED) + "_mass_"  + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_outcomes.csv")
         outcomes = []
     
     # show how long simulations took
@@ -120,6 +120,8 @@ def print_simulation_record():
     print(f"\tNoise: {NOISE}")
     print(f"\tmass: {sys.argv[1]} distribution")
     print(f"\tindependence: {sys.argv[2]} distribution")
+    print(f"\tmass weight: {sys.argv[3]}")
+    print(f"\tindependence weight: {sys.argv[4]}")
     print(f"\tNumber of players: {len(PLAYERS)}")
     print(f"\tStrategies:")
     for strategy in STRATEGIES:
@@ -132,8 +134,8 @@ class massBasedMatch(axl.Match):
      def final_score_per_turn(self): 
          outcomes.append(Counter([regex.sub('',str(i)) for i in self.result]))    
          base_scores = axl.Match.final_score_per_turn(self)
-         mass_scores = [PLAYER.mass * score for PLAYER, score in zip(self.players[::-1], base_scores)] # list reversed so opponent profits from mass
-         return [score + (PLAYER.mass * PLAYER.independence) for PLAYER, score in zip(self.players, mass_scores)] # list not reversed so player profits from his mass * independence
+         mass_scores = [PLAYER.mass * score * float(sys.argv[3]) for PLAYER, score in zip(self.players[::-1], base_scores)] # list reversed so opponent profits from mass
+         return [score + (PLAYER.mass * PLAYER.independence * float(sys.argv[4])) for PLAYER, score in zip(self.players, mass_scores)] # list not reversed so player profits from his mass * independence
 
 
 class massBasedMoranProcess(axl.MoranProcess):
