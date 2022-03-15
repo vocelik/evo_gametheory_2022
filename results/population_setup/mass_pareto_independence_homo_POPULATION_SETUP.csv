@@ -1,0 +1,41 @@
+,player_id,player_strategy,mass,independence,ratio
+0,1,GTFT: 0.33,0.76,1,0.76
+1,2,Defector,0.8,1,0.8
+2,3,Defector,0.96,1,0.96
+3,4,Defector,0.76,1,0.76
+4,5,Tit For Tat,1.22,1,1.22
+5,6,Defector,1.19,1,1.19
+6,7,Cooperator,0.73,1,0.73
+7,8,Cooperator,1.32,1,1.32
+8,9,GTFT: 0.33,1.56,1,1.56
+9,10,Cooperator,0.75,1,0.75
+10,11,Defector,0.83,1,0.83
+11,12,Tit For Tat,0.74,1,0.74
+12,13,GTFT: 0.33,0.7,1,0.7
+13,14,Tit For Tat,0.75,1,0.75
+14,15,Defector,0.73,1,0.73
+15,16,Cooperator,0.98,1,0.98
+16,17,Defector,0.75,1,0.75
+17,18,Defector,2.14,1,2.14
+18,19,Cooperator,0.72,1,0.72
+19,20,Tit For Tat,0.75,1,0.75
+20,21,GTFT: 0.33,0.74,1,0.74
+21,22,Cooperator,0.95,1,0.95
+22,23,Defector,0.84,1,0.84
+23,24,GTFT: 0.33,1.07,1,1.07
+24,25,Tit For Tat,0.79,1,0.79
+25,26,GTFT: 0.33,0.78,1,0.78
+26,27,Tit For Tat,0.95,1,0.95
+27,28,GTFT: 0.33,1.15,1,1.15
+28,29,Defector,0.8,1,0.8
+29,30,Cooperator,0.76,1,0.76
+30,31,GTFT: 0.33,1.04,1,1.04
+31,32,GTFT: 0.33,0.82,1,0.82
+32,33,Tit For Tat,0.99,1,0.99
+33,34,Cooperator,0.93,1,0.93
+34,35,GTFT: 0.33,0.83,1,0.83
+35,36,Tit For Tat,1.0,1,1.0
+36,37,Cooperator,0.78,1,0.78
+37,38,Cooperator,0.98,1,0.98
+38,39,Tit For Tat,0.83,1,0.83
+39,40,Tit For Tat,0.79,1,0.79
