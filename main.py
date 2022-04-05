@@ -10,10 +10,12 @@ from vars import *
 
 # import note, strategies only have memory inside a match class
 outcomes = []
+count_population = 0
 
 def main():
 
     global outcomes
+    global count_population
 
     # check if the script was called correctly 
     if len(sys.argv) < 5:
@@ -33,43 +35,47 @@ def main():
         for population in list(distributions_independence.keys()):
             print(population)
         return False
-
-    # set player heterogeneity mass and independence and save the players
-    set_PLAYER_heterogeneity(PLAYERS, distributions_mass[sys.argv[1]], distributions_independence[sys.argv[2]]) 
-    save_population_setup()
-
-    # save the mass and independence plots
-    save_initialized_plot()
-
-    # the simulation record
-    print_simulation_record()
-
-    # start time and keep track of how long the simulations run
+    
     start_time = time.time()
 
-    # loop over seeds and run simulation
-    for SEED in SEEDS:
-        print(f"Running seed {SEED}...")
-        mp = massBasedMoranProcess(PLAYERS, match_class=massBasedMatch, turns=TURNS, seed=SEED, mutation_rate=MUTATION_RATE, noise=NOISE)
+    for numpy_seed in NUMPY_RANDOM_SEEDS:
+
+        # set player heterogeneity mass and independence and save the players
+        set_PLAYER_heterogeneity(PLAYERS, distributions_mass[sys.argv[1]][count_population], distributions_independence[sys.argv[2]][count_population]) 
+        save_population_setup()
+
+        # save the mass and independence plots
+        save_initialized_plot()
+
+        # the simulation record
+        if count_population == 0:
+            print_simulation_record()
+
+        # loop over seeds and run simulation
+        for SEED in SEEDS:
+            print(f"Running seed {SEED}...")
+            mp = massBasedMoranProcess(PLAYERS, match_class=massBasedMatch, turns=TURNS, seed=SEED, mutation_rate=MUTATION_RATE, noise=NOISE)
+            
+            # loop over moran process until a single strategy dominates the population or max round is reached
+            for i, _ in enumerate(mp):
+                if len(mp.population_distribution()) == 1 or i == MAX_ROUNDS - 1:
+                    break 
+
+            rounds_played = i
+            # save population distribution
+            pd.DataFrame(mp.populations).fillna(0).astype(int).to_csv("results/population_evolution/seed_ " + str(SEED) + "_mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_population_seed_" + str(numpy_seed) + ".csv")
+
+            # save outcomes of each round
+            df_outcomes = pd.DataFrame(outcomes).fillna(0).rename(columns = {"CC":"coop","CD":"exploit","DC":"exploit_","DD":"defect",})
+            df_outcomes['round'] = np.repeat([i + 1 for i in range(rounds_played + 1)], comb(len(PLAYERS),2))
+            df_outcomes['seed'] = SEED
+            df_outcomes = df_outcomes.groupby(['round','seed']).sum()
+            df_outcomes = df_outcomes.astype(int)
+            df_outcomes.to_csv("results/outcomes_per_round/seed_" + str(SEED) + "_mass_"  + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_outcomes_" + "population_seed_" + str(numpy_seed) + ".csv")
+            outcomes = []
         
-        # loop over moran process until a single strategy dominates the population or max round is reached
-        for i, _ in enumerate(mp):
-            if len(mp.population_distribution()) == 1 or i == MAX_ROUNDS - 1:
-                break 
-
-        rounds_played = i
-        # save population distribution
-        pd.DataFrame(mp.populations).fillna(0).astype(int).to_csv("results/population_evolution/seed_ " + str(SEED) + "_mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_population_distribution.csv")
-
-        # save outcomes of each round
-        df_outcomes = pd.DataFrame(outcomes).fillna(0).rename(columns = {"CC":"coop","CD":"exploit","DC":"exploit_","DD":"defect",})
-        df_outcomes['round'] = np.repeat([i + 1 for i in range(rounds_played + 1)], comb(len(PLAYERS),2))
-        df_outcomes['seed'] = SEED
-        df_outcomes = df_outcomes.groupby(['round','seed']).sum()
-        df_outcomes = df_outcomes.astype(int)
-        df_outcomes.to_csv("results/outcomes_per_round/seed_" + str(SEED) + "_mass_"  + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_outcomes.csv")
-        outcomes = []
-    
+        count_population += 1
+        
     # show how long simulations took
     print(f"Program ran for {round((time.time() - start_time) / 3600,2)} hours.")
 
@@ -88,12 +94,13 @@ def set_PLAYER_heterogeneity(PLAYERS, masses, independences, ids = [i for i in r
 
 def save_initialized_plot():
     # save the mass and independence plot
-    plt.hist(distributions_mass[sys.argv[1]])
-    plt.savefig("results/figures/mass/" + str(sys.argv[1]) + "_mass_distribution.png")
+    plt.hist(distributions_mass[sys.argv[1]][count_population])
+    plt.savefig("results/figures/mass/" + str(sys.argv[1]) + "_mass_distribution_" + "population_seed_" + str(NUMPY_RANDOM_SEEDS[count_population]) + ".png")
     plt.clf()
-    plt.hist(distributions_mass[sys.argv[2]])
-    plt.savefig("results/figures/independence/" + str(sys.argv[2]) + "_independence_distribution.png")
-    print("Mass and independence histograms saved.")
+    plt.hist(distributions_independence[sys.argv[2]][count_population])
+    plt.savefig("results/figures/independence/" + str(sys.argv[2]) + "_independence_distribution_" + "population_seed_" + str(NUMPY_RANDOM_SEEDS[count_population]) + ".png")
+    plt.clf()
+    print(f"Mass and independence histograms saved from seed: {NUMPY_RANDOM_SEEDS[count_population]}.")
 
 
 def save_population_setup():
@@ -106,7 +113,7 @@ def save_population_setup():
     }
 
     df = pd.DataFrame(data=data)
-    df.to_csv("results/population_setup/" + "mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_POPULATION_SETUP.csv")
+    df.to_csv("results/population_setup/" + "mass_" + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_POPULATION_SETUP_" + "population_seed_" + str(NUMPY_RANDOM_SEEDS[count_population]) + ".csv")
     print("Population setup saved.")
 
 
@@ -116,6 +123,7 @@ def print_simulation_record():
     print(f"\tMax rounds: {MAX_ROUNDS}")
     print(f"\tTurns: {TURNS}")
     print(f"\tSeeds: {[seed for seed in SEEDS]}")
+    print(f"\tPopulations: {len(NUMPY_RANDOM_SEEDS)}")
     print(f"\tMutation rate: {MUTATION_RATE}")
     print(f"\tNoise: {NOISE}")
     print(f"\tmass: {sys.argv[1]} distribution")
@@ -141,7 +149,7 @@ class massBasedMatch(axl.Match):
 class massBasedMoranProcess(axl.MoranProcess):
      """Axelrod MoranProcess class """
      def __next__(self):
-         set_PLAYER_heterogeneity(self.players, distributions_mass[sys.argv[1]], distributions_independence[sys.argv[2]])
+         set_PLAYER_heterogeneity(self.players, distributions_mass[sys.argv[1]][count_population], distributions_independence[sys.argv[2]][count_population])
          super().__next__()
          return self
 
