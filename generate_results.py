@@ -71,7 +71,7 @@ def main():
 
         df_plot = sns.barplot(x = "seed", y = "average_percentage", hue="strategy",data = df)
         sns.move_legend(df_plot, "upper right", bbox_to_anchor=(1, 1), title='outcome')
-        df_plot.set_title('Outcomes of simulation.' + ' Mass: ' + sys.argv[1] + ', Independence: ' + sys.argv[2] + str(population_seed))
+        df_plot.set_title('Outcomes of simulation.' + ' Mass: ' + sys.argv[1] + ', Independence: ' + sys.argv[2] + " Population seed: " str(population_seed))
         df_plot.set_ylabel('average percentage')
         df_plot.set_xlabel('seed')
         fig = df_plot.get_figure()

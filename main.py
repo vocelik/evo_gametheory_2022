@@ -35,10 +35,14 @@ def main():
         for population in list(distributions_independence.keys()):
             print(population)
         return False
+
+    if len(NUMPY_RANDOM_SEEDS) != len(SEEDS):
+        print("The length of population seeds must be equal to the length of tournament seeds.")
+        return False
     
     start_time = time.time()
 
-    for numpy_seed in NUMPY_RANDOM_SEEDS:
+    for i, numpy_seed in enumerate(NUMPY_RANDOM_SEEDS):
 
         # set player heterogeneity mass and independence and save the players
         set_PLAYER_heterogeneity(PLAYERS, distributions_mass[sys.argv[1]][count_population], distributions_independence[sys.argv[2]][count_population]) 
@@ -52,7 +56,8 @@ def main():
             print_simulation_record()
 
         # loop over seeds and run simulation
-        for SEED in SEEDS:
+        for _ in range(len(SEEDS)):
+            SEED = SEEDS[i]
             print(f"Running seed {SEED}...")
             mp = massBasedMoranProcess(PLAYERS, match_class=massBasedMatch, turns=TURNS, seed=SEED, mutation_rate=MUTATION_RATE, noise=NOISE)
             
@@ -73,6 +78,7 @@ def main():
             df_outcomes = df_outcomes.astype(int)
             df_outcomes.to_csv("results/outcomes_per_round/seed_" + str(SEED) + "_mass_"  + str(sys.argv[1]) + "_independence_" + str(sys.argv[2]) + "_mass_weight_" + str(sys.argv[3]) + "_independence_weight_" + str(sys.argv[4]) + "_outcomes_" + "population_seed_" + str(numpy_seed) + ".csv")
             outcomes = []
+            break
         
         count_population += 1
         
