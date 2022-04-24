@@ -1,0 +1,4 @@
+,seed,population_seed,strategy,average_sum,sd_sum,average_percentage,sd_percentage
+0,990,721,coop,41255156,10755,0.529,0.138
+1,990,721,defect,11299600,7007,0.145,0.09
+2,990,721,exploitation,25445244,3976,0.326,0.051

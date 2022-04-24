@@ -3,17 +3,17 @@ import numpy as np
 import re
 from scipy.stats import truncnorm
 
-np.random.seed(2048) # important because it determines how the players are shuffled
+np.random.seed(1) # important because it determines how the players are shuffled
 
 regex = re.compile('[^a-zA-Z]') # used for cleaning result output
 
 # MORAN PROCESS SETUP
 MAX_ROUNDS = 1000
-SEEDS = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+SEEDS = [894, 201, 450, 898, 588, 80, 824, 218, 780, 385, 559, 743, 411, 536, 895, 367, 461, 130, 711, 612, 565, 990, 897, 179, 123]
 TURNS = 100
 MUTATION_RATE = .1
 NOISE = .1
-NUMPY_RANDOM_SEEDS = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+NUMPY_RANDOM_SEEDS = [981, 409, 953, 550, 634, 598, 763, 828, 638, 553, 223, 332, 759, 35, 579, 642, 625, 123, 748, 510, 85, 721, 136, 537, 445]
 
 # STRATEGY SETUP
 STRATEGIES = [axl.Defector, axl.TitForTat, axl.GTFT, axl.Cooperator]
