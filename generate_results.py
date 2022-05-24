@@ -115,7 +115,7 @@ def main():
                         + str(sys.argv[4])
                         + "_population_seed_"
                         + str(population_seed)
-                        + ".png"
+                        + ".pdf"
                     )
                     plt.clf()
 
@@ -198,7 +198,7 @@ def main():
             + str(sys.argv[4])
             + "_population_seed_"
             + str(population_seed)
-            + "_average_percentage.png"
+            + "_average_percentage.pdf"
         )
         plt.clf()
 

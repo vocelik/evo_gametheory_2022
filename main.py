@@ -169,7 +169,7 @@ def save_initialized_plot():
         + "_mass_distribution_"
         + "population_seed_"
         + str(NUMPY_RANDOM_SEEDS[count_population])
-        + ".png"
+        + ".pdf"
     )
     plt.clf()
     plt.hist(distributions_independence[sys.argv[2]][count_population])
@@ -179,7 +179,7 @@ def save_initialized_plot():
         + "_independence_distribution_"
         + "population_seed_"
         + str(NUMPY_RANDOM_SEEDS[count_population])
-        + ".png"
+        + ".pdf"
     )
     plt.clf()
     print(
