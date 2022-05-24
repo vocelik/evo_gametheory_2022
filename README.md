@@ -1,5 +1,43 @@
 # Quick Tutorial
 
+## Setting up the virtual environment
+
+Note that currently all code is supported to run on Python 3.8, 3.9 and 3.10.
+
+To create a virtual environment:
+
+    $ python -m venv env
+
+To activate the environment:
+
+    $ source env/bin/activate
+
+To install the specific versions of all libraries:
+
+    $ python -m pip install -r requirements.txt
+    
+## Testing
+
+All code is formatted using [`black`](https://github.com/psf/black). To check
+that all code is formatted correctly:
+
+    $ python -m black .
+
+To run the tests:
+
+    $ python -m pytest .
+
+## Numerical experiments
+
+The file `jobs.txt` contains all jobs to run. This can be used with gnu `parallel`
+to parallelise the running of the jobs:
+
+    parallel --jobs 20 < jobs.txt
+
+Would run the jobs using 20 cores.
+
+## Basic example
+
 to run, execute the following in the terminal with your desired population and weight as the terminal arguments. 
 
 e.g. `python main.py normal pareto` will run a simulation with a population where the mass is normally distribution with $\mu = 5$ and $\sigma = 12.5$ and weight follows a pareto distribution with $\alpha = 1$ and $m = 1/10$. Of course, these values can be changedin the `vars.py` file.
