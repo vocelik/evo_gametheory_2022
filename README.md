@@ -23,6 +23,19 @@ that all code is formatted correctly:
 
     $ python -m black .
 
+To run the tests:
+
+    $ python -m pytest .
+
+## Numerical experiments
+
+The file `jobs.txt` contains all jobs to run. This can be used with gnu `parallel`
+to parallelise the running of the jobs:
+
+    parallel --jobs 20 < jobs.txt
+
+Would run the jobs using 20 cores.
+
 ## Basic example
 
 to run, execute the following in the terminal with your desired population and weight as the terminal arguments. 
